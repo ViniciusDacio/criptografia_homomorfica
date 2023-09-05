@@ -1,1 +1,1 @@
-# criptografia_homomorfica
+# Implementação testes de cifragem de imagens com criptografia homomórfica.
