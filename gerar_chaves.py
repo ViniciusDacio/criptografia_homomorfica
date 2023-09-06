@@ -5,7 +5,6 @@ def write_data(file_name, data):
     if type(data) == bytes:
         #bytes to base64
         data = base64.b64encode(data)
-
     with open(file_name, 'wb') as f:
         f.write(data)
 
