@@ -1,4 +1,4 @@
-import validacao.util as util
+import util
 import tenseal as ts
 import os
 
