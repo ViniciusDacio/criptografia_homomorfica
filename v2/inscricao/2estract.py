@@ -1,4 +1,4 @@
-import validacao.util as util
+import util
 import os
 from deepface import DeepFace
 import tenseal as ts
