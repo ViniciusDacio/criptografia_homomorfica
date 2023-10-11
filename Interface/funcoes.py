@@ -62,26 +62,39 @@ def cifrar(img1_embedding, nome_arq, salvar):
     enc_v1_proto = enc_v1.serialize()
     if salvar == True:
         write_data("extracao/"+nome_arq+"_cifrado.txt", enc_v1_proto)
-
     return enc_v1_proto
 
-def comparacao(enc_v1, enc_v2):
-    #distancia euclidiana
+def deserializar(usuario_base, arq_cifra, chave_publica):
+    context = ts.context_from(read_data(chave_publica))
+
+    arq1 = read_data("extracao/"+usuario_base+"_cifrado.txt")
+    arq_base = ts.lazy_ckks_vector_from(arq1)
+    arq_base.link_context(context)
+
+    arq_validacao = ts.lazy_ckks_vector_from(arq_cifra)
+    arq_validacao.link_context(context)
+
+    return arq_base, arq_validacao
+
+def comparacao(enc_v1, enc_v2, chave):
     euclidean_squared = enc_v1 - enc_v2
     euclidean_squared = euclidean_squared.dot(euclidean_squared)
 
     #armazenar a distância euclidiana quadrada criptografada homomórfica
-    write_data("cifrado/euclidean_squared.txt", euclidean_squared.serialize())
+    write_data("euclidean_squared.txt", euclidean_squared.serialize())
 
     #cliente tem a chave secreta
-    context = ts.context_from(read_data("chaves/secret.txt"))
+    context = ts.context_from(read_data(chave))
 
     #carregar valor quadrado da distancia euclidiana
-    euclidean_squared_proto = read_data("cifrado/euclidean_squared.txt")
+    euclidean_squared_proto = read_data("euclidean_squared.txt")
     euclidean_squared = ts.lazy_ckks_vector_from(euclidean_squared_proto)
     euclidean_squared.link_context(context)
 
-    #descriptografar
+    #descriptografar resultado
     euclidean_distance = euclidean_squared.decrypt()[0]
 
-    return 1 if euclidean_distance < 100 else 0
+    return euclidean_distance
+
+def arquivo_existe(caminho):
+    return os.path.isfile(caminho)
